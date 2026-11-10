@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: spark
+
+spark:
+  dataset-dir: data/customs_data.csv
+  artists-dir: data/ru_lyrics_info.csv
+  master-url: local[*]
+  app-name: Pdp Spark
+
+logging:
+  level:
+    org.apache.hadoop.util.Shell: ERROR
+    org.apache.hadoop.conf.Configuration: ERROR
