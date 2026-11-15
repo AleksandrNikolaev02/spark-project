@@ -6,7 +6,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class Tokenizer {
-    private static final Pattern TOKEN = Pattern.compile("[\\p{L}\\p{N}]+");
+    /** Слово; допускает одиночную «*» внутри (маскировка мата: «бл*дь»). */
+    private static final Pattern TOKEN = Pattern.compile("[\\p{L}\\p{N}]+(?:\\*[\\p{L}\\p{N}]*)*");
+
+    private Tokenizer() {
+    }
 
     public static List<String> tokenize(String normalizedText) {
         List<String> tokens = new ArrayList<>();
