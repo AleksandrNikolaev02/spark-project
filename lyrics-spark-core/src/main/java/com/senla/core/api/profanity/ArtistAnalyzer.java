@@ -12,21 +12,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ArtistAnalyzer implements Serializable, ArtistAnalyzeFunction {
 
-    private final List<String> roots;
-    private final Set<String> exactForms;
+    private final ProfanityMatcher matcher;
 
     public ArtistAnalyzer(List<String> words) {
-        this.roots = words.stream()
-                .filter(w -> w.length() >= 4)
-                .toList();
-        this.exactForms = words.stream()
-                .filter(w -> w.length() < 4)
-                .collect(Collectors.toSet());
+        this.matcher = new ProfanityMatcher(words);
     }
 
     public ArtistReport analyze(String artist, List<Song> songs) {
@@ -64,7 +56,7 @@ public class ArtistAnalyzer implements Serializable, ArtistAnalyzeFunction {
         Map<String, Integer> hits = new HashMap<>();
 
         for (String token : tokens) {
-            String root = match(token);
+            String root = matcher.match(token);
             if (root != null) {
                 bad++;
                 hits.merge(root, 1, Integer::sum);
@@ -75,11 +67,4 @@ public class ArtistAnalyzer implements Serializable, ArtistAnalyzeFunction {
         return new LyricsStats(total, bad, hits.size(), ratio, hits);
     }
 
-    private String match(String token) {
-        if (exactForms.contains(token)) return token;
-        for (String root : roots) {
-            if (token.startsWith(root)) return root;
-        }
-        return null;
-    }
 }
