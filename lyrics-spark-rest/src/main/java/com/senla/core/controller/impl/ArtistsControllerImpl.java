@@ -3,9 +3,12 @@ package com.senla.core.controller.impl;
 import com.senla.core.api.dto.ArtistCountDto;
 import com.senla.core.api.dto.ArtistReport;
 import com.senla.core.api.dto.SongStats;
+import com.senla.core.dto.GetProfanityByArtistDto;
 import com.senla.core.service.ArtistsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +41,11 @@ public class ArtistsControllerImpl {
     @GetMapping("/getArtistSongReport")
     public List<SongStats> getArtistSongReport(@RequestParam String name, @RequestParam int top) {
         return artistsService.getMostProfanitySongOfArtist(name, top);
+    }
+
+    @PostMapping("/getProfanityByArtistNames")
+    public List<ArtistReport> getProfanityByArtistNames(@RequestBody GetProfanityByArtistDto dto) {
+        return artistsService.getProfanityByArtistNames(dto.artistNames());
     }
 
     @Autowired

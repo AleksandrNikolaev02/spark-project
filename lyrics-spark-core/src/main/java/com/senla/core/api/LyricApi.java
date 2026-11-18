@@ -67,7 +67,15 @@ public class LyricApi {
                 .csv(pathSource)
                 .map(mapper, Encoders.bean(Song.class));
 
-        Dataset<ArtistReport> reports = songs.groupByKey((MapFunction<Song, String>) Song::getArtistName, Encoders.STRING())
+        Dataset<ArtistReport> reports = groupByArtistName(songs, analyzeFunction);
+
+        return reports.orderBy(col("badRatio").desc())
+                .limit(top)
+                .collectAsList();
+    }
+
+    private Dataset<ArtistReport> groupByArtistName(Dataset<Song> songs, ArtistAnalyzeFunction analyzeFunction) {
+        return songs.groupByKey((MapFunction<Song, String>) Song::getArtistName, Encoders.STRING())
                 .flatMapGroups(
                         (FlatMapGroupsFunction<String, Song, ArtistReport>)
                                 (artist, iterator) -> {
@@ -80,10 +88,6 @@ public class LyricApi {
                                 },
                         Encoders.bean(ArtistReport.class)
                 );
-
-        return reports.orderBy(col("badRatio").desc())
-                .limit(top)
-                .collectAsList();
     }
 
     public ArtistReport getProfanityByArtistName(TypedMapFunction<Song> mapper,
@@ -117,6 +121,23 @@ public class LyricApi {
                         Encoders.bean(SongStats.class)
                 ).orderBy(col("badRatio").desc())
                 .limit(top)
+                .collectAsList();
+    }
+
+    public List<ArtistReport> getProfanityByArtistNames(
+            TypedMapFunction<Song> mapper,
+            ArtistAnalyzeFunction analyzeFunction,
+            String sourcePath,
+            List<String> artistNames) {
+        Dataset<Song> songs = sparkSession.read()
+                .option("header", "true")
+                .option("multiLine", "true")
+                .csv(sourcePath)
+                .where(col(ARTIST.getColumn()).isin(artistNames.toArray()))
+                .map(mapper, Encoders.bean(Song.class));
+
+        return groupByArtistName(songs, analyzeFunction)
+                .orderBy(col("badRatio").desc())
                 .collectAsList();
     }
 

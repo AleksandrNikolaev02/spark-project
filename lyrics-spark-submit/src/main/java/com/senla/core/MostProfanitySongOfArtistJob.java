@@ -8,7 +8,6 @@ public class MostProfanitySongOfArtistJob {
     public static void main(String[] args) {
         SparkSession sparkSession = SparkSession.builder()
                 .appName("Artist Analyzer")
-                .master("local[*]")
                 .getOrCreate();
 
         try {

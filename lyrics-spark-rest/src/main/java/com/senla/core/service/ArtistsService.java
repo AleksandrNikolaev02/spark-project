@@ -53,6 +53,12 @@ public class ArtistsService {
         return lyricApi.getMostProfanitySongOfArtist(mapper, analyzeFunction, config.getArtistsPath(), artistName, top);
     }
 
+    public List<ArtistReport> getProfanityByArtistNames(List<String> names) {
+        var mapper = mapperSolver.getMapperFunction(Song.class);
+
+        return lyricApi.getProfanityByArtistNames(mapper, analyzeFunction, config.getArtistsPath(), names);
+    }
+
     @Autowired
     public void setConfig(ArtistConfig config) {
         this.config = config;
